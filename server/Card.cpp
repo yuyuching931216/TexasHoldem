@@ -24,8 +24,6 @@ Deck::Deck() : currentCard_(0) {
     shuffle();
 }
 
-Deck::~Deck() {}
-
 void Deck::shuffle() {
     std::random_device rd;
     std::mt19937 g(rd());
@@ -42,4 +40,9 @@ Card Deck::dealCard() {
 
 bool Deck::isEmpty() const {
     return currentCard_ >= cards_.size();
+}
+
+void Deck::reset() {
+    currentCard_ = 0;
+    shuffle();
 }

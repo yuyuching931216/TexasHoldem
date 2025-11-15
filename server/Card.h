@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <string>
 
@@ -20,9 +21,11 @@ private:
 class Deck {
 public:
     Deck();
+    ~Deck() = default;  // 使用預設解構子
     void shuffle();
     Card dealCard();
     bool isEmpty() const;
+	void reset();
     
 private:
     std::vector<Card> cards_;
