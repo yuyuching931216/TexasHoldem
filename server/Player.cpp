@@ -57,7 +57,9 @@ bool Player::fold() {
 }
 
 bool Player::check() {
-    if (state_ == PlayerState::ACTIVE && currentBet_ == 0) {
+    // 只有在活躍狀態且沒有需要跟注的情況下才能 check
+    // 這個方法現在主要由 Game 類別來控制邏輯
+    if (state_ == PlayerState::ACTIVE) {
         lastAction_ = PlayerAction::CHECK;
         return true;
     }
@@ -71,7 +73,8 @@ bool Player::call(int callAmount) {
     
     int amountToCall = callAmount - currentBet_;
     
-    if (amountToCall == 0) {
+    if (amountToCall <= 0) {
+        // 如果沒有需要額外支付的金額，這應該是 check
         return check();
     }
     
@@ -89,15 +92,17 @@ bool Player::call(int callAmount) {
     return false;
 }
 
-bool Player::raise(int raiseAmount) {
-    if (state_ != PlayerState::ACTIVE || raiseAmount <= 0) {
+bool Player::raise(int totalBetAmount) {
+    if (state_ != PlayerState::ACTIVE || totalBetAmount <= currentBet_) {
         return false;
     }
     
-    if (chips_ >= raiseAmount) {
-        removeChips(raiseAmount);
-        lastBet_ = raiseAmount;
-        currentBet_ += raiseAmount;
+    int amountToRaise = totalBetAmount - currentBet_;
+    
+    if (chips_ >= amountToRaise) {
+        removeChips(amountToRaise);
+        lastBet_ = amountToRaise;
+        currentBet_ = totalBetAmount;
         lastAction_ = PlayerAction::RAISE;
         return true;
     } else if (chips_ > 0) {
@@ -121,13 +126,13 @@ bool Player::allIn() {
     return true;
 }
 
-// Round management
+// Round management  
 void Player::startNewRound() {
     lastAction_ = PlayerAction::WAIT;
     lastBet_ = 0;
-    currentBet_ = 0;
+    // 注意：不重置 currentBet_，因為這在整個下注回合中需要保持
     
-    if (state_ != PlayerState::DISCONNECTED && chips_ > 0) {
+    if (state_ != PlayerState::DISCONNECTED && state_ != PlayerState::FOLDED && chips_ > 0) {
         state_ = PlayerState::ACTIVE;
     } else if (chips_ == 0) {
         state_ = PlayerState::ALL_IN;
