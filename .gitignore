@@ -153,7 +153,7 @@ cmake_install.cmake
 Makefile
 *.cmake
 
-# Visual Studio build directories and files
+# Visual Studio build directories and files (Updated for comprehensive coverage)
 x64/
 x86/
 Debug/
@@ -167,10 +167,7 @@ ARM64/
 bin/
 obj/
 packages/
-*.vcxproj
-*.vcxproj.filters
 *.vcxproj.user
-*.sln
 *.suo
 *.user
 *.aps
@@ -204,18 +201,27 @@ packages/
 *.svclog
 *.scc
 
+# Visual Studio build-specific files (from your Git logs)
+*.exe.recipe
+*.tlog
+*.lastbuildstate
+
 # MSVC runtime and debug files
 *.exp
 *.map
 *.res
 *.rc.tmp
 *.manifest.tmp
-*.lastbuildstate
-*.tlog
 
 # Visual Studio Code
 .vscode/
 *.code-workspace
+
+# Visual Studio IDE configuration files
+CppProperties.json
+.vscode/
+*.code-workspace
+launchSettings.json
 
 # CLion
 .idea/
@@ -285,6 +291,7 @@ config.json
 SmartPtrTexasHoldem.exe
 SimplifiedSmartPtr.exe
 TexasHoldemWithEvaluator.exe
+TexasHoldem.exe
 
 # Generated documentation
 *.md.tmp
