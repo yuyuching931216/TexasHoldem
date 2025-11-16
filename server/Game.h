@@ -4,10 +4,10 @@
 #include <memory>
 #include "Card.h"
 
-// «e¸m«Å§i
+// å‰ç½®å®£å‘Š
 class Player;
 
-// ¤Uª`¦^¦XªTÁ|
+// ä¸‹æ³¨å›åˆæšèˆ‰
 enum class BettingRound {
     PRE_FLOP,
     FLOP,
@@ -20,18 +20,18 @@ class PokerGame {
         PokerGame();
         ~PokerGame() = default;
         
-        // ¹CÀ¸±±¨î
+        // éŠæˆ²æ§åˆ¶
         void startGame();
         void addPlayer(const Player& player);
         std::string getGameState() const;
         
-        // µoµP¬ÛÃö
+        // ç™¼ç‰Œç›¸é—œ
         void dealHoleCards();
         void dealFlop();
         void dealTurn();
         void dealRiver();
         
-        // ¤Uª`¬ÛÃö
+        // ä¸‹æ³¨ç›¸é—œ
         void processBettingRound(BettingRound round);
         void processBlinds();
         void runBettingRound(BettingRound round);
@@ -40,27 +40,27 @@ class PokerGame {
         void performPlayerAction(Player& player);
         bool canPlayerCheck(const Player& player) const;
         
-        // ÅuµP©M³Ó­t§P©w
+        // æ”¤ç‰Œå’Œå‹è² åˆ¤å®š
         void showdownAndDetermineWinner();
         
-        // ª±®a¶¶§ÇºŞ²z
+        // ç©å®¶é †åºç®¡ç†
         int getBigBlindIndex() const;
         int getSmallBlindIndex() const;
         int getNextActivePlayerIndex(int startIndex) const;
         int getBettingStartIndex(BettingRound round) const;
         
-        // ¹CÀ¸ª¬ºAºŞ²z
+        // éŠæˆ²ç‹€æ…‹ç®¡ç†
         void resetPlayersForNewHand();
         void setupBlinds();
         
-        // Àò¨ú¹CÀ¸¸ê°T
+        // ç²å–éŠæˆ²è³‡è¨Š
         int getActivePlayerCount() const;
         int getPot() const;
         int getCurrentBet() const;
         const std::vector<Player>& getPlayers() const { return players_; }
         const std::vector<Card>& getCommunityCards() const { return communityCards_; }
         
-        // ¤u¨ã¤èªk
+        // å·¥å…·æ–¹æ³•
         static std::string bettingRoundToString(BettingRound round);
         
     private:
@@ -69,5 +69,5 @@ class PokerGame {
         std::vector<Player> players_;
         int currentPlayer_;
         int pot_;
-        int currentBet_;  // ·í«e¦^¦Xªº³Ì°ª¤Uª`ª÷ÃB
+        int currentBet_;  // ç•¶å‰å›åˆçš„æœ€é«˜ä¸‹æ³¨é‡‘é¡
     };

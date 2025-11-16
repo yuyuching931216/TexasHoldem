@@ -7,15 +7,15 @@
 int main() {
     std::cout << "Texas Hold'em Server Starting..." << std::endl;
     
-    // ³Ğ«ØÂ²³æªº´ú¸Õ
+    // å‰µå»ºç°¡å–®çš„æ¸¬è©¦
     PokerGame game;
     
-    // ²K¥[ª±®a
+    // æ·»åŠ ç©å®¶
     for (int i = 1; i <= 8; ++i) {
         game.addPlayer(Player(i, "Player" + std::to_string(i), 1000));
     }
 
-    // ¶}©l¹CÀ¸
+    // é–‹å§‹éŠæˆ²
     game.startGame();
     
     //std::cout << "Game State:" << std::endl;
