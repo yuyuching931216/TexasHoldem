@@ -2,25 +2,24 @@
 #include "Player.h"
 #include "Game.h"
 #include <iostream>
+#include <vector>
 
-//int main() {
-//    std::cout << "Texas Hold'em Server Starting..." << std::endl;
-//    
-//    // ³Ð«ØÂ²³æªº´ú¸Õ
-//    PokerGame game;
-//    
-//    // ²K¥[ª±®a
-//    Player player1(1, "Player1", 1000);
-//    Player player2(2, "Player2", 1000);
-//    
-//    game.addPlayer(player1);
-//    game.addPlayer(player2);
-//    
-//    // ¶}©l¹CÀ¸
-//    game.startGame();
-//    
-//    std::cout << "Game State:" << std::endl;
-//    std::cout << game.getGameState() << std::endl;
-//    
-//    return 0;
-//}
+int main() {
+    std::cout << "Texas Hold'em Server Starting..." << std::endl;
+    
+    // å‰µå»ºç°¡å–®çš„æ¸¬è©¦
+    PokerGame game;
+    
+    // æ·»åŠ çŽ©å®¶
+    for (int i = 1; i <= 8; ++i) {
+        game.addPlayer(Player(i, "Player" + std::to_string(i), 1000));
+    }
+
+    // é–‹å§‹éŠæˆ²
+    game.startGame();
+    
+    //std::cout << "Game State:" << std::endl;
+    //std::cout << game.getGameState() << std::endl;
+    
+    return 0;
+}

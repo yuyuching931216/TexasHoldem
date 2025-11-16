@@ -153,8 +153,20 @@ cmake_install.cmake
 Makefile
 *.cmake
 
-# Visual Studio files
+# Visual Studio build directories and files
+x64/
+x86/
+Debug/
+Release/
+DebugDLL/
+ReleaseDLL/
+Win32/
+ARM/
+ARM64/
 .vs/
+bin/
+obj/
+packages/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
@@ -178,8 +190,8 @@ Makefile
 *.sdf
 *.opensdf
 *.unsuccessfulbuild
-ipch/
 *.idb
+*.pdb
 *.pgc
 *.pgd
 *.rsp
@@ -191,6 +203,15 @@ ipch/
 *.pidb
 *.svclog
 *.scc
+
+# MSVC runtime and debug files
+*.exp
+*.map
+*.res
+*.rc.tmp
+*.manifest.tmp
+*.lastbuildstate
+*.tlog
 
 # Visual Studio Code
 .vscode/
@@ -213,12 +234,25 @@ xcuserdata/
 *.pro.user
 *.pro.user.*
 
+# Code::Blocks
+*.depend
+*.layout
+*.cbp
+
+# Dev-C++
+*.dev
+
+# MinGW
+*.a
+*.dll.a
+
 # Temporary files
 *~
 *.swp
 *.swo
 *tmp*
 *.tmp
+*.temp
 
 # OS generated files
 .DS_Store
@@ -228,6 +262,7 @@ xcuserdata/
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
 # Game specific files
 *.save
@@ -243,3 +278,32 @@ screenshots/
 *.p12
 secrets.json
 config.json
+
+# Test executables and outputs
+*Test.exe
+*test.exe
+SmartPtrTexasHoldem.exe
+SimplifiedSmartPtr.exe
+TexasHoldemWithEvaluator.exe
+
+# Generated documentation
+*.md.tmp
+Doxygen/
+doc/html/
+doc/latex/
+
+# Backup files
+*.orig
+*.rej
+*~
+*.backup
+*.bck
+
+# Core dumps
+core.*
+*.core
+*.dmp
+
+# Memory leak detection
+*.dmp
+*.mdmp
