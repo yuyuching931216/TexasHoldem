@@ -1,14 +1,24 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 #include "Card.h"
 
 // 前置宣告
 class Player;
 
+// 下注回合枚舉
+enum class BettingRound {
+    PRE_FLOP,
+    FLOP,
+    TURN,
+    RIVER
+};
+
 class PokerGame {
     public:
         PokerGame();
+        ~PokerGame() = default;
         
         // 遊戲控制
         void startGame();
@@ -22,13 +32,22 @@ class PokerGame {
         void dealRiver();
         
         // 下注相關
-        void processBettingRound(const std::string& roundName);
+        void processBettingRound(BettingRound round);
         void processBlinds();
-        void runBettingRound();
+        void runBettingRound(BettingRound round);
         bool isBettingRoundComplete();
         bool needsToAct(const Player& player);
         void performPlayerAction(Player& player);
         bool canPlayerCheck(const Player& player) const;
+        
+        // 攤牌和勝負判定
+        void showdownAndDetermineWinner();
+        
+        // 玩家順序管理
+        int getBigBlindIndex() const;
+        int getSmallBlindIndex() const;
+        int getNextActivePlayerIndex(int startIndex) const;
+        int getBettingStartIndex(BettingRound round) const;
         
         // 遊戲狀態管理
         void resetPlayersForNewHand();
@@ -40,6 +59,9 @@ class PokerGame {
         int getCurrentBet() const;
         const std::vector<Player>& getPlayers() const { return players_; }
         const std::vector<Card>& getCommunityCards() const { return communityCards_; }
+        
+        // 工具方法
+        static std::string bettingRoundToString(BettingRound round);
         
     private:
         Deck deck_;
