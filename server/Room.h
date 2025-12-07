@@ -39,7 +39,8 @@ public:
     void broadcast(const std::string& message, int excludePlayerId = -1);
     
     // 獲取房間狀態
-    std::string getRoomState() const;
+    std::string getRoomState() const;      // 簡單狀態（房間信息）
+    std::string getGameState() const;      // 詳細狀態（遊戲信息）
     std::string getPlayerList() const;
     
 private:

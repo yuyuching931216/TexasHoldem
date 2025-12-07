@@ -113,6 +113,10 @@ class PokerClient:
         elif command == "STATE":
             self.display_game_state(parts[1] if len(parts) > 1 else "")
             
+        elif command == "GAMESTATE":
+            # 詳細遊戲狀態
+            self.display_game_state(parts[1] if len(parts) > 1 else "")
+            
         elif command == "ACTION":
             if len(parts) >= 3:
                 player_id, action = parts[1], parts[2]
@@ -190,6 +194,7 @@ class PokerClient:
         print("  raise <amount>       - Raise bet")
         print("  allin                - Go all-in")
         print("  status               - Get room status")
+        print("  gamestate            - Get detailed game state")
         print("  quit                 - Leave the game")
         print("  help                 - Show this help")
         print()
@@ -219,6 +224,7 @@ class PokerClient:
                     print("  raise <amount>       - Raise bet")
                     print("  allin                - Go all-in")
                     print("  status               - Get room status")
+                    print("  gamestate            - Get detailed game state")
                     print("  quit                 - Leave the game\n")
                     
                 elif command == "join":
@@ -248,6 +254,9 @@ class PokerClient:
                     
                 elif command == "status":
                     self.send_message("STATUS")
+                    
+                elif command == "gamestate":
+                    self.send_message("GAMESTATE")
                     
                 elif command == "quit":
                     self.disconnect()

@@ -15,13 +15,15 @@
    - 異步讀寫操作
    - 命令解析和處理
    - 優雅的斷線處理
+   - **✨ v1.2: 添加 GAMESTATE 命令支持**
 
 3. **Room.h / Room.cpp**
    - 遊戲房間管理
    - 玩家加入/離開
    - 廣播消息
    - 遊戲狀態同步
-   - **✨ 死鎖問題已修復**
+   - **✨ v1.1: 死鎖問題已修復**
+   - **✨ v1.2: 添加 getGameState() 公共方法**
 
 #### 遊戲邏輯模塊（已存在並整合）
 - Game.h / Game.cpp - 德州撲克遊戲邏輯
@@ -39,6 +41,7 @@
    - 支援所有遊戲命令
    - 實時顯示遊戲狀態
    - 錯誤處理和用戶友好的界面
+   - **✨ v1.2: 添加 gamestate 命令**
 
 2. **test_clients.py**
    - 多客戶端測試腳本
@@ -70,16 +73,18 @@
 4. **TESTING.md** - 測試指南和測試案例
 5. **PROJECT_STRUCTURE.md** - 專案結構和架構說明
 6. **VISUAL_STUDIO_SETUP.md** - Visual Studio 配置步驟
-7. **DEADLOCK_FIX.md** - 死鎖問題修復說明 ⭐
+7. **DEADLOCK_FIX.md** - 死鎖問題修復說明
+8. **PROTOCOL_UPDATE.md** - 通訊協議更新說明 ⭐ 新增
+9. **FIX_GAMESTATE_SUMMARY.md** - 狀態查詢修復總結 ⭐ 新增
 
 ### 配置文件
 
 1. **config.ini** - 配置文件範例
 2. **.gitignore** - Git 版本控制配置
 
-## 🔧 重要修復
+## 🔧 重要修復和改進
 
-### 死鎖問題解決
+### v1.1 - 死鎖問題解決
 
 **問題**: 資源死鎖（resource deadlock would occur）
 
@@ -96,6 +101,27 @@
 
 詳細說明請參閱 [DEADLOCK_FIX.md](DEADLOCK_FIX.md)
 
+### v1.2 - 狀態查詢改進 ⭐ 新增
+
+**問題**: 
+- `getRoomState()` 只返回簡單的房間信息
+- `formatGameState()` 有詳細信息但客戶端無法訪問
+- 客戶端無法查詢當前的遊戲詳情（彩池、下注、公共牌等）
+
+**解決方案**:
+1. ✅ 添加 `getGameState()` 公共方法 - 暴露詳細遊戲狀態
+2. ✅ 新增 `GAMESTATE` 命令 - 客戶端可查詢詳細狀態
+3. ✅ 保持向後兼容 - 原有 `STATUS` 命令繼續提供簡單狀態
+4. ✅ 重用現有代碼 - `getGameState()` 調用 `formatGameStateUnsafe()`
+
+**現在的狀態查詢架構**:
+```
+STATUS 命令    → getRoomState()   → 簡單房間資訊（玩家數、遊戲狀態）
+GAMESTATE 命令 → getGameState()   → 詳細遊戲資訊（彩池、下注、公共牌、玩家）
+```
+
+詳細說明請參閱 [PROTOCOL_UPDATE.md](PROTOCOL_UPDATE.md)
+
 ## 🎯 核心特性
 
 ### 網路功能
@@ -103,13 +129,15 @@
 - ✅ 支持多個並發客戶端（最多10人）
 - ✅ 優雅的連接管理和錯誤處理
 - ✅ 文本協議，易於調試和擴展
-- ✅ **線程安全，無死鎖風險** ⭐
+- ✅ **線程安全，無死鎖風險**
+- ✅ **靈活的狀態查詢（簡單/詳細）** ⭐
 
 ### 遊戲功能
 - ✅ 完整的德州撲克遊戲邏輯
 - ✅ 支持所有基本動作（Fold, Check, Call, Raise, All-in）
 - ✅ 手牌評估和勝負判定
 - ✅ 實時遊戲狀態同步
+- ✅ **多層級狀態查詢** ⭐
 
 ### 記憶體安全
 - ✅ 使用 `std::shared_ptr` 和 `std::unique_ptr`
@@ -250,7 +278,7 @@ start_client.bat
 ```cpp
 // 智能指針
 std::shared_ptr<Session>
-std::unique_ptr<PokerGame>
+std::unique_ptr<PokerGame
 
 // 移動語義
 Session(boost::asio::ip::tcp::socket socket, ...)
@@ -352,7 +380,7 @@ try {
 - 多線程編程
 - 網路協議設計
 - 客戶端-伺服器架構
-- 遊戲邏輯實現
+- 樂透遊戲邏輯實現
 
 ## 🤝 貢獻
 

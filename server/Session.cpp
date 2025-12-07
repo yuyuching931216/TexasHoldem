@@ -117,8 +117,13 @@ void Session::processMessage(const std::string& message) {
             room_->processPlayerAction(playerId_, action, amount);
         }
         else if (command == "STATUS") {
-            // STATUS - 查詢房間狀態
+            // STATUS - 查詢房間基本狀態
             send("STATUS|" + room_->getRoomState() + "\n");
+        }
+        else if (command == "GAMESTATE") {
+            // GAMESTATE - 查詢詳細遊戲狀態
+            std::string gameState = room_->getGameState();
+            send("GAMESTATE|" + gameState + "\n");
         }
         else if (command == "QUIT") {
             // QUIT - 離開房間

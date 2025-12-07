@@ -244,6 +244,11 @@ std::string Room::getRoomState() const {
     return ss.str();
 }
 
+std::string Room::getGameState() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return formatGameStateUnsafe();
+}
+
 std::string Room::getPlayerList() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return getPlayerListUnsafe();
