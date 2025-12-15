@@ -170,7 +170,28 @@ HandValue HandEvaluator::checkStraightFlush(const std::vector<Card>& cards) {
             std::sort(pair.second.rbegin(), pair.second.rend());
             
             // 檢查是否有連續的5張牌
-            for (size_t i = 0; i <= pair.second.size() - 5; ++i) {
+            for (size_t i = 0; i + 4 < pair.second.size(); ++i) {
+                bool isSequential = true;
+                for (int j = 0; j < 4; ++j) {
+                    if (pair.second[i + j] - pair.second[i + j + 1] != 1) {
+                        isSequential = false;
+                        break;
+                    }
+                }
+                
+                if (isSequential) {
+                    HandValue result;
+                    result.rank = HandRank::STRAIGHT_FLUSH;
+                    result.kickers = {pair.second[i], pair.second[i+1], pair.second[i+2], 
+                                    pair.second[i+3], pair.second[i+4]};
+                    result.score = calculateScore(result.rank, result.kickers);
+                    return result;
+                }
+            }
+            
+            // 檢查最後一組
+            {
+                size_t i = pair.second.size() - 5;
                 bool isSequential = true;
                 for (int j = 0; j < 4; ++j) {
                     if (pair.second[i + j] - pair.second[i + j + 1] != 1) {
@@ -306,8 +327,42 @@ HandValue HandEvaluator::checkStraight(const std::vector<Card>& cards) {
     
     std::vector<int> values(uniqueValues.rbegin(), uniqueValues.rend());
     
+    // 需要至少5張不同的牌才能形成順子
+    if (values.size() < 5) {
+        // 檢查 A, 2, 3, 4, 5 順子（輪盤順）
+        if (uniqueValues.count(14) && uniqueValues.count(2) && uniqueValues.count(3) && 
+            uniqueValues.count(4) && uniqueValues.count(5)) {
+            HandValue result;
+            result.rank = HandRank::STRAIGHT;
+            result.kickers = {5, 4, 3, 2, 1}; // A 當作 1
+            result.score = calculateScore(result.rank, result.kickers);
+            return result;
+        }
+        return HandValue();
+    }
+    
     // 檢查連續的5張牌
-    for (size_t i = 0; i <= values.size() - 5; ++i) {
+    for (size_t i = 0; i + 4 < values.size(); ++i) {
+        bool isSequential = true;
+        for (int j = 0; j < 4; ++j) {
+            if (values[i + j] - values[i + j + 1] != 1) {
+                isSequential = false;
+                break;
+            }
+        }
+        
+        if (isSequential) {
+            HandValue result;
+            result.rank = HandRank::STRAIGHT;
+            result.kickers = {values[i], values[i+1], values[i+2], values[i+3], values[i+4]};
+            result.score = calculateScore(result.rank, result.kickers);
+            return result;
+        }
+    }
+    
+    // 檢查最後一組（從索引 values.size() - 5 開始）
+    {
+        size_t i = values.size() - 5;
         bool isSequential = true;
         for (int j = 0; j < 4; ++j) {
             if (values[i + j] - values[i + j + 1] != 1) {

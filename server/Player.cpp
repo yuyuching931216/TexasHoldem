@@ -5,8 +5,8 @@
 // Constructor
 Player::Player(int playerId, const std::string& name, int chips)
     : playerId_(playerId), name_(name), chips_(chips), state_(PlayerState::WAITING),
-      lastAction_(PlayerAction::WAIT), lastBet_(0), currentBet_(0), position_(-1),
-      isDealer_(false), isSmallBlind_(false), isBigBlind_(false),
+      lastAction_(PlayerAction::WAIT), lastBet_(0), currentBet_(0), totalBetThisHand_(0),
+      position_(-1), isDealer_(false), isSmallBlind_(false), isBigBlind_(false),
       connectionId_(-1), isConnected_(false), handsPlayed_(0), handsWon_(0) {
     hand_.reserve(2); // Texas Hold'em uses 2 hole cards
 }
@@ -21,6 +21,7 @@ void Player::addChips(int amount) {
 bool Player::removeChips(int amount) {
     if (amount > 0 && chips_ >= amount) {
         chips_ -= amount;
+        totalBetThisHand_ += amount;  // 追蹤這手牌的總投注
         return true;
     }
     return false;
@@ -57,8 +58,6 @@ bool Player::fold() {
 }
 
 bool Player::check() {
-    // 只有在活躍狀態且沒有需要跟注的情況下才能 check
-    // 這個方法現在主要由 Game 類別來控制邏輯
     if (state_ == PlayerState::ACTIVE) {
         lastAction_ = PlayerAction::CHECK;
         return true;
@@ -74,7 +73,6 @@ bool Player::call(int callAmount) {
     int amountToCall = callAmount - currentBet_;
     
     if (amountToCall <= 0) {
-        // 如果沒有需要額外支付的金額，這應該是 check
         return check();
     }
     
@@ -120,6 +118,7 @@ bool Player::allIn() {
     
     lastBet_ = chips_;
     currentBet_ += chips_;
+    totalBetThisHand_ += chips_;  // 追蹤總投注
     chips_ = 0;
     state_ = PlayerState::ALL_IN;
     lastAction_ = PlayerAction::ALL_IN;
@@ -130,7 +129,8 @@ bool Player::allIn() {
 void Player::startNewRound() {
     lastAction_ = PlayerAction::WAIT;
     lastBet_ = 0;
-    // 注意：不重置 currentBet_，因為這在整個下注回合中需要保持
+    // 不重置 currentBet_，因為這在下注回合結束時需要保留
+    // 不重置 totalBetThisHand_，這是整手牌的累計
     
     if (state_ != PlayerState::DISCONNECTED && state_ != PlayerState::FOLDED && chips_ > 0) {
         state_ = PlayerState::ACTIVE;
@@ -145,6 +145,7 @@ void Player::resetForNewHand() {
     lastAction_ = PlayerAction::WAIT;
     lastBet_ = 0;
     currentBet_ = 0;
+    totalBetThisHand_ = 0;  // 重置這手牌的總投注
     isDealer_ = false;
     isSmallBlind_ = false;
     isBigBlind_ = false;

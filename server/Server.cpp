@@ -3,11 +3,12 @@
 #include "Room.h"
 #include <iostream>
 
-Server::Server(boost::asio::io_context& ioContext, short port)
+Server::Server(boost::asio::io_context& ioContext, short port, bool autoStart)
     : acceptor_(ioContext, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)),
-      room_(std::make_shared<Room>(1)) {
+      room_(std::make_shared<Room>(1, autoStart)) {
     
     std::cout << "Texas Hold'em Server started on port " << port << std::endl;
+    std::cout << "Auto-start: " << (autoStart ? "enabled" : "disabled") << std::endl;
     std::cout << "Waiting for players..." << std::endl;
     
     doAccept();

@@ -56,6 +56,11 @@ public:
     int getCurrentBet() const { return currentBet_; }
     void setCurrentBet(int bet) { currentBet_ = bet; }
     
+    // 追蹤整手牌的總投注額（用於邊池計算）
+    int getTotalBetThisHand() const { return totalBetThisHand_; }
+    void setTotalBetThisHand(int bet) { totalBetThisHand_ = bet; }
+    void addToTotalBet(int amount) { totalBetThisHand_ += amount; }
+    
     // Action methods
     bool fold();
     bool check();
@@ -115,6 +120,7 @@ private:
     PlayerAction lastAction_;
     int lastBet_;
     int currentBet_;
+    int totalBetThisHand_;  // 整手牌的總投注額（用於邊池計算）
     
     // Position information
     int position_;
