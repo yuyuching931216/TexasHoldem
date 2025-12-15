@@ -95,6 +95,10 @@ public:
     void startNewRound();
     void resetForNewHand();
     
+    // Track if player has acted in current betting round
+    bool hasActedThisRound() const { return hasActedThisRound_; }
+    void setHasActedThisRound(bool acted) { hasActedThisRound_ = acted; }
+    
     // Statistics
     int getHandsPlayed() const { return handsPlayed_; }
     int getHandsWon() const { return handsWon_; }
@@ -121,6 +125,7 @@ private:
     int lastBet_;
     int currentBet_;
     int totalBetThisHand_;  // 整手牌的總投注額（用於邊池計算）
+    bool hasActedThisRound_;  // Whether player has acted in current betting round
     
     // Position information
     int position_;
