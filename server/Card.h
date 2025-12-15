@@ -10,6 +10,11 @@ class Card {
 public:
     Card(Suit suit, Rank rank);
     std::string toString() const;
+    std::string toShortString() const;  // µu®æ¦¡: "2h", "As"
+    std::string getRankString() const;  // "2", "10", "J", "Q", "K", "A"
+    std::string getSuitString() const;  // "hearts", "diamonds", "clubs", "spades"
+    char getRankChar() const;           // '2'-'9', 'T', 'J', 'Q', 'K', 'A'
+    char getSuitChar() const;           // 'h', 'd', 'c', 's'
     Suit getSuit() const { return suit_; }
     Rank getRank() const { return rank_; }
     

@@ -15,6 +15,44 @@ std::string Card::toString() const {
     return std::string(rankNames[static_cast<int>(rank_) - 2]) + " of " + suitNames[static_cast<int>(suit_)];
 }
 
+std::string Card::toShortString() const {
+    std::string result;
+    result += getRankChar();
+    result += getSuitChar();
+    return result;
+}
+
+std::string Card::getRankString() const {
+    static const char* rankNames[] = {
+        "2", "3", "4", "5", "6", "7", "8", "9", "10",
+        "J", "Q", "K", "A"
+    };
+    return rankNames[static_cast<int>(rank_) - 2];
+}
+
+std::string Card::getSuitString() const {
+    static const char* suitNames[] = {"hearts", "diamonds", "clubs", "spades"};
+    return suitNames[static_cast<int>(suit_)];
+}
+
+char Card::getRankChar() const {
+    static const char rankChars[] = "23456789TJQKA";
+    int index = static_cast<int>(rank_) - 2;
+    if (index >= 0 && index < 13) {
+        return rankChars[index];
+    }
+    return '?';
+}
+
+char Card::getSuitChar() const {
+    static const char suitChars[] = "hdcs";
+    int index = static_cast<int>(suit_);
+    if (index >= 0 && index < 4) {
+        return suitChars[index];
+    }
+    return '?';
+}
+
 Deck::Deck() : currentCard_(0) {
     for (int s = 0; s < 4; ++s) {
         for (int r = 2; r <= 14; ++r) {

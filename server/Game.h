@@ -60,6 +60,11 @@ class PokerGame {
         const std::vector<Player>& getPlayers() const { return players_; }
         const std::vector<Card>& getCommunityCards() const { return communityCards_; }
         
+        // 設置遊戲狀態（供 Room 使用）
+        void setPot(int pot) { pot_ = pot; }
+        void setCurrentBet(int bet) { currentBet_ = bet; }
+        void addToPot(int amount) { pot_ += amount; }
+        
         // 工具方法
         static std::string bettingRoundToString(BettingRound round);
         

@@ -7,7 +7,7 @@ class Room;
 // Server類別 - 管理網路連接和遊戲房間
 class Server {
 public:
-    Server(boost::asio::io_context& ioContext, short port);
+    Server(boost::asio::io_context& ioContext, short port, bool autoStart = true);
     
 private:
     void doAccept();

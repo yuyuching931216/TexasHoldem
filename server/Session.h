@@ -20,6 +20,7 @@ private:
     void doRead();
     void doWrite();
     void processMessage(const std::string& message);
+    void processJsonMessage(const std::string& json);
     
     boost::asio::ip::tcp::socket socket_;
     std::shared_ptr<Room> room_;

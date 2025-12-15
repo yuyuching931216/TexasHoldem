@@ -269,6 +269,7 @@ desktop.ini
 *.cfg
 config/
 logs/
+log/
 screenshots/
 
 # Network and security
