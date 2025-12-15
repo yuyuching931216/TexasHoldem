@@ -440,6 +440,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                 
                 if (action == "FOLD") {
                     currentPlayer->fold();
+                    currentPlayer->setHasActedThisRound(true);
                     validAction = true;
                     actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                    ",\"action\":\"FOLD\"}";
@@ -448,6 +449,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                 else if (action == "CHECK") {
                     if (toCall <= 0) {
                         currentPlayer->check();
+                        currentPlayer->setHasActedThisRound(true);
                         validAction = true;
                         actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                        ",\"action\":\"CHECK\"}";
@@ -463,6 +465,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                         if (actualCall > 0 && currentPlayer->removeChips(actualCall)) {
                             currentPlayer->setCurrentBet(currentPlayer->getCurrentBet() + actualCall);
                             game_->addToPot(actualCall);
+                            currentPlayer->setHasActedThisRound(true);
                             
                             // 檢查是否是 all-in
                             if (currentPlayer->getChips() == 0) {
@@ -480,6 +483,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                             // 籌碼為 0，視為 check (如果可以的話)
                             if (toCall == 0) {
                                 currentPlayer->check();
+                                currentPlayer->setHasActedThisRound(true);
                                 validAction = true;
                                 actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                                ",\"action\":\"CHECK\"}";
@@ -487,6 +491,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                             } else {
                                 // 必須棄牌
                                 currentPlayer->fold();
+                                currentPlayer->setHasActedThisRound(true);
                                 validAction = true;
                                 actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                                ",\"action\":\"FOLD\"}";
@@ -496,6 +501,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                     } else {
                         // 沒有需要跟注的，當作 check
                         currentPlayer->check();
+                        currentPlayer->setHasActedThisRound(true);
                         validAction = true;
                         actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                        ",\"action\":\"CHECK\"}";
@@ -521,8 +527,11 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                         if (newBet > game_->getCurrentBet()) {
                             game_->setCurrentBet(newBet);
                             lastRaisePlayerId_ = playerId;
+                            // When someone raises, other players who already acted need to act again
+                            resetActedFlagsExcept(playerId);
                         }
                         currentPlayer->setState(PlayerState::ALL_IN);
+                        currentPlayer->setHasActedThisRound(true);
                         validAction = true;
                         actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                        ",\"action\":\"ALL_IN\",\"amount\":" + std::to_string(allInAmount) + "}";
@@ -535,6 +544,9 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                             game_->addToPot(needToPay);
                             game_->setCurrentBet(raiseTotal);
                             lastRaisePlayerId_ = playerId;
+                            // When someone raises, other players who already acted need to act again
+                            resetActedFlagsExcept(playerId);
+                            currentPlayer->setHasActedThisRound(true);
                             validAction = true;
                             actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                            ",\"action\":\"RAISE\",\"amount\":" + std::to_string(raiseTotal) + "}";
@@ -554,8 +566,11 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                         if (newBet > game_->getCurrentBet()) {
                             game_->setCurrentBet(newBet);
                             lastRaisePlayerId_ = playerId;
+                            // When someone raises, other players who already acted need to act again
+                            resetActedFlagsExcept(playerId);
                         }
                         currentPlayer->setState(PlayerState::ALL_IN);
+                        currentPlayer->setHasActedThisRound(true);
                         validAction = true;
                         actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                        ",\"action\":\"ALL_IN\",\"amount\":" + std::to_string(allInAmount) + "}";
@@ -564,6 +579,7 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
                         // 籌碼為 0，無法 all-in，視為 check 或 fold
                         if (toCall == 0) {
                             currentPlayer->check();
+                            currentPlayer->setHasActedThisRound(true);
                             validAction = true;
                             actionMessage = "{\"type\":\"ACTION\",\"player_id\":" + std::to_string(playerId) + 
                                            ",\"action\":\"CHECK\"}";
@@ -614,29 +630,29 @@ void Room::processPlayerAction(int playerId, const std::string& action, int amou
 bool Room::isRoundComplete() const {
     const auto& players = game_->getPlayers();
     int activePlayers = 0;
-    int playersActed = 0;
+    int playersActedAndMatched = 0;
     
     for (const auto& player : players) {
         if (player.isActive()) {
             activePlayers++;
-            // 玩家已經跟注到當前下注金額
-            if (player.getCurrentBet() == game_->getCurrentBet()) {
-                playersActed++;
+            // Player must have acted AND matched the current bet
+            if (player.hasActedThisRound() && player.getCurrentBet() == game_->getCurrentBet()) {
+                playersActedAndMatched++;
             }
         } else if (player.isAllIn()) {
-            // All-in 玩家算作已行動
+            // All-in players count as having acted
             activePlayers++;
-            playersActed++;
+            playersActedAndMatched++;
         }
     }
     
-    // 只剩一個或更少的活躍玩家
+    // Only one or fewer active players remaining
     if (activePlayers <= 1) {
         return true;
     }
     
-    // 所有活躍玩家都已經跟注到相同金額
-    return playersActed == activePlayers && activePlayers > 0;
+    // All active players have acted and matched the current bet
+    return playersActedAndMatched == activePlayers && activePlayers > 0;
 }
 
 int Room::getNextActivePlayer(int fromIndex) const {
@@ -706,6 +722,8 @@ void Room::advanceToNextStage() {
                 auto& players = const_cast<std::vector<Player>&>(game_->getPlayers());
                 for (auto& player : players) {
                     player.setCurrentBet(0);
+                    // Reset hasActedThisRound for new betting round
+                    player.setHasActedThisRound(false);
                 }
                 game_->setCurrentBet(0);
                 
@@ -751,6 +769,17 @@ void Room::printCommunityCards() const {
     }
     LOG_INFO("Room", ss.str());
     LOG_INFO("Room", "Pot: $" + std::to_string(game_->getPot()));
+}
+
+void Room::resetActedFlagsExcept(int excludePlayerId) {
+    // Reset hasActedThisRound for all active players except the one who just raised
+    // This is called when someone raises, so other players need to act again
+    auto& players = const_cast<std::vector<Player>&>(game_->getPlayers());
+    for (auto& player : players) {
+        if (player.getId() != excludePlayerId && player.isActive()) {
+            player.setHasActedThisRound(false);
+        }
+    }
 }
 
 void Room::processShowdown() {

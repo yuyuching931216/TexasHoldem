@@ -6,6 +6,7 @@
 Player::Player(int playerId, const std::string& name, int chips)
     : playerId_(playerId), name_(name), chips_(chips), state_(PlayerState::WAITING),
       lastAction_(PlayerAction::WAIT), lastBet_(0), currentBet_(0), totalBetThisHand_(0),
+      hasActedThisRound_(false),
       position_(-1), isDealer_(false), isSmallBlind_(false), isBigBlind_(false),
       connectionId_(-1), isConnected_(false), handsPlayed_(0), handsWon_(0) {
     hand_.reserve(2); // Texas Hold'em uses 2 hole cards
@@ -129,6 +130,7 @@ bool Player::allIn() {
 void Player::startNewRound() {
     lastAction_ = PlayerAction::WAIT;
     lastBet_ = 0;
+    hasActedThisRound_ = false;  // Reset for new betting round
     // 不重置 currentBet_，因為這在下注回合結束時需要保留
     // 不重置 totalBetThisHand_，這是整手牌的累計
     
@@ -146,6 +148,7 @@ void Player::resetForNewHand() {
     lastBet_ = 0;
     currentBet_ = 0;
     totalBetThisHand_ = 0;  // 重置這手牌的總投注
+    hasActedThisRound_ = false;  // Reset for new hand
     isDealer_ = false;
     isSmallBlind_ = false;
     isBigBlind_ = false;

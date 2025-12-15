@@ -93,6 +93,7 @@ private:
     int getNextActivePlayer(int fromIndex) const;
     std::string stageToString(GameStage stage) const;
     void printCommunityCards() const;  // 伺服器端顯示公共牌
+    void resetActedFlagsExcept(int excludePlayerId);  // Reset hasActedThisRound for all players except one
     
     // JSON 格式化
     std::string formatGameStateJson() const;
